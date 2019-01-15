@@ -69,8 +69,10 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
 
     <?php
         //est ce que l'utilisateur a choisi une lettre ?
-        if (isset($_GET['letter']) && strlen($_GET['letter']) == 1 && strpos($alphabet, $_GET['letter']) !==false) {
+        if (isset($_GET['letter']) && strlen($_GET['letter']) == 1 && strpos($alphabet, $_GET['letter']) !==false && $_SESSION['count'] < 10) {
          //   echo "<br/>".$_GET['letter'];
+            $_SESSION['count'] ++;
+            echo   $_SESSION['count'];
             chooseLetter($_GET['letter']);
         }
     ?>
@@ -88,6 +90,7 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
                     session_unset(); // je libère toutes les variables des parties précédentes
                     $_SESSION['secret_word'] = "pendu";
                     $_SESSION['current_word'] = "";
+                    $_SESSION['count'] = 0; 
 
                     //boucle pour parcourir le mot secret et remplacer chaque lettre par un " _ "
                     for ($i = 0; $i <strlen($_SESSION['secret_word']); $i++) { 
@@ -111,12 +114,14 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
     <div class="alphabet">
         <?php
         //quand faut'il créer une nouvelle partie ? 
-        if (isset($_POST['partie']) && $_POST['partie'] == 'new') {
+        if (isset($_POST['partie']) && $_POST['partie'] == 'new')  {
             init();
         } 
         //Affichage du mot + alphabet
-        for ($i = 0; $i < strlen($alphabet); $i++) {
-            echo " <a href='index.php?letter=$alphabet[$i]'>$alphabet[$i]</a> ";
+        if ($_SESSION['count']<10 || $_SESSION['secret_word'] == $_SESSION['current_word']){
+            for ($i = 0; $i < strlen($alphabet); $i++) {
+                echo " <a href='index.php?letter=$alphabet[$i]'>$alphabet[$i]</a> ";
+            }
         }
         ?>
     </div>
@@ -126,6 +131,11 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
             if ($_SESSION['secret_word'] == $_SESSION['current_word']) {
                 echo ' <h1> You WIN !</h1> ';
             }
+
+            if ($_SESSION['count']>9) {
+                echo '<h1> You lost ! </h1>';
+            }
+
         ?>
      </div>
 
