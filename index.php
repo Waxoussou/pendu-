@@ -45,12 +45,19 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
         margin-left: 50px; 
     } 
 
-    .winGame{
-        color: #81DAF5;
+    .winGame, .looseGame{
         width: 300px; 
         height: 45px; 
         text-align: center; 
         margin: 150px 40% auto 35%;  
+    }
+
+    .winGame{
+        color: #81DAF5;
+    }
+
+    .looseGame{
+        color: red;
     }
 
     </style>
@@ -118,7 +125,7 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
             init();
         } 
         //Affichage du mot + alphabet
-        if ($_SESSION['count']<10 || $_SESSION['secret_word'] == $_SESSION['current_word']){
+        if ($_SESSION['count']<10 && $_SESSION['secret_word'] !== $_SESSION['current_word']){
             for ($i = 0; $i < strlen($alphabet); $i++) {
                 echo " <a href='index.php?letter=$alphabet[$i]'>$alphabet[$i]</a> ";
             }
@@ -131,15 +138,14 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
             if ($_SESSION['secret_word'] == $_SESSION['current_word']) {
                 echo ' <h1> You WIN !</h1> ';
             }
-
+        ?>
+    </div>        
+    <div class="looseGame">
+        <?php
             if ($_SESSION['count']>9) {
                 echo '<h1> You lost ! </h1>';
             }
-
         ?>
-     </div>
-
-        
-
+    </div>
 </body>
 </html>
