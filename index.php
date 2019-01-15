@@ -1,7 +1,6 @@
 <?php 
 session_start();
 $alphabet = "abcdefghijklmnopqrstuvwxyz"
-
 ?>
 
 <!DOCTYPE html>
@@ -32,12 +31,16 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
    }
 
     .alphabet a{
-        color: green;
-        margin: auto 15px; 
+        color: #3399ff;
+        margin: auto 25px; 
         font-size: 1.3em;  
         font-weight: bold;
+        border-radius: 3px; 
+        text-decoration: none;
     /* text-transform: uppercase;*/
     }
+
+    
     
     .currentWord{
         letter-spacing: 2em; 
@@ -66,38 +69,52 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
 
     <?php
     function chooseLetter ($letter){
+        
+        $found = false; //variable pour compter lettre erronée 
         for ($i = 0; $i < strlen($_SESSION['secret_word']); $i++) {
             if ($_SESSION['secret_word'][$i] == $letter) {
                 $_SESSION['current_word'][$i] = $letter;
+                $found = true;
             }
-        }
+        } 
+        if (!$found){
+            $_SESSION['error'] ++ ;
+            }
     }
     ?>
 
     <?php
         //est ce que l'utilisateur a choisi une lettre ?
-        if (isset($_GET['letter']) && strlen($_GET['letter']) == 1 && strpos($alphabet, $_GET['letter']) !==false && $_SESSION['count'] < 10) {
+        if (isset($_GET['letter']) && strlen($_GET['letter']) == 1 && strpos($alphabet, $_GET['letter']) !==false && $_SESSION['error'] < 10) {
          //   echo "<br/>".$_GET['letter'];
             $_SESSION['count'] ++;
-            echo   $_SESSION['count'];
+            echo  '<p> counter : '.$_SESSION['count'].'</p>';
+            echo '<p> number of mistakes : '.$_SESSION['error'].'</p>';
             chooseLetter($_GET['letter']);
         }
     ?>
 
+    <?php
+        //quand faut'il créer une nouvelle partie ? 
+        if (isset($_POST['partie']) && $_POST['partie'] == 'new')  {
+            init();
+        } 
+    ?>    
 
     <div class="party">
         <form method="post" action="index.php">
             <input type="hidden" name="partie" value="new">
-            <input class= "newGame" type="submit" value="Nouvelle partie">
+            <input class= "newGame" type="submit" value="new Game">
         </form>
         <div class="secretWord">
             <?php
                 function init() {
                     global $alphabet;
                     session_unset(); // je libère toutes les variables des parties précédentes
-                    $_SESSION['secret_word'] = "pendu";
+                    $_SESSION['secret_word'] = "pendejo";
                     $_SESSION['current_word'] = "";
                     $_SESSION['count'] = 0; 
+                    $_SESSION['error'] = 0;
 
                     //boucle pour parcourir le mot secret et remplacer chaque lettre par un " _ "
                     for ($i = 0; $i <strlen($_SESSION['secret_word']); $i++) { 
@@ -118,18 +135,14 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
 
     </div>
 
-    <div class="alphabet">
+    <div class="alphabet">     
         <?php
-        //quand faut'il créer une nouvelle partie ? 
-        if (isset($_POST['partie']) && $_POST['partie'] == 'new')  {
-            init();
-        } 
-        //Affichage du mot + alphabet
-        if ($_SESSION['count']<10 && $_SESSION['secret_word'] !== $_SESSION['current_word']){
-            for ($i = 0; $i < strlen($alphabet); $i++) {
-                echo " <a href='index.php?letter=$alphabet[$i]'>$alphabet[$i]</a> ";
+            //Affichage du mot + alphabet
+            if ($_SESSION['error']<10 && $_SESSION['secret_word'] !== $_SESSION['current_word']){
+                for ($i = 0; $i < strlen($alphabet); $i++) {
+                    echo " <a href='index.php?letter=$alphabet[$i]'>$alphabet[$i]</a> ";
+                }
             }
-        }
         ?>
     </div>
     
@@ -142,8 +155,8 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
     </div>        
     <div class="looseGame">
         <?php
-            if ($_SESSION['count']>9) {
-                echo '<h1> You lost ! </h1>';
+            if ($_SESSION['error']>9) {
+                echo '<h1> You lost ! </h1><br><p>you can try again</p>';
             }
         ?>
     </div>
