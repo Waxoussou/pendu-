@@ -22,11 +22,13 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
         width: 200px; 
         text-transform: uppercase; 
         font-weight: bold; 
-        margin: 50px 50px; 
+        margin: 25px 50px; 
     }
 
    .party{
        display: flex;
+       margin-bottom: 50px; 
+       flex-direction: column; 
    }
 
     .alphabet a{
@@ -34,85 +36,98 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
         margin: auto 15px; 
         font-size: 1.3em;  
         font-weight: bold;
-        text-transform: uppercase;
+    /* text-transform: uppercase;*/
     }
     
     .currentWord{
         letter-spacing: 2em; 
         font-size: 2.5em;
+        margin-left: 50px; 
     } 
+
+    .winGame{
+        color: #81DAF5;
+        width: 300px; 
+        height: 45px; 
+        text-align: center; 
+        margin: 150px 40% auto 35%;  
+    }
 
     </style>
 </head>
 <body>
 
-<div class="party">
-        
-    <form method="post" action="index.php">
-        <input type="hidden" name="partie" value="new">
-        <input class= "newGame" type="submit" value="Nouvelle partie">
-    </form>
-    
-    <div class="secretWord">
-
-        <?php
-        function init() {
-            global $alphabet;
-            session_unset(); // je libère toutes les variables des parties précédentes
-            $_SESSION['secret_word'] = "pendu";
-            $_SESSION['current_word'] = "";
-
-            //boucle pour parcourir le mot secret et remplacer chaque lettre par un " _ "
-            for ($i = 0; $i <strlen($_SESSION['secret_word']); $i++) { 
-                $_SESSION['current_word'][$i] = $_SESSION['current_word']."_" ; // ou plus simple :  $_SESSION['current_word'][$i] .= " _ ";
-            }          
+    <?php
+    function chooseLetter ($letter){
+        for ($i = 0; $i < strlen($_SESSION['secret_word']); $i++) {
+            if ($_SESSION['secret_word'][$i] == $letter) {
+                $_SESSION['current_word'][$i] = $letter;
+            }
         }
-        
-       // isset($_POST['partie']); // on vérifie que la variable existe 
-       // $_POST['partie'] == 'new'; // on vérifie qu'il y a une valeur dedans
-        ?>
-        <br>
+    }
+    ?>
 
-        <div class="currentWord">
+    <?php
+        //est ce que l'utilisateur a choisi une lettre ?
+        if (isset($_GET['letter']) && strlen($_GET['letter']) == 1 && strpos($alphabet, $_GET['letter']) !==false) {
+         //   echo "<br/>".$_GET['letter'];
+            chooseLetter($_GET['letter']);
+        }
+    ?>
+
+
+    <div class="party">
+        <form method="post" action="index.php">
+            <input type="hidden" name="partie" value="new">
+            <input class= "newGame" type="submit" value="Nouvelle partie">
+        </form>
+        <div class="secretWord">
             <?php
-            echo $_SESSION['current_word'].'<br>';        
+                function init() {
+                    global $alphabet;
+                    session_unset(); // je libère toutes les variables des parties précédentes
+                    $_SESSION['secret_word'] = "pendu";
+                    $_SESSION['current_word'] = "";
+
+                    //boucle pour parcourir le mot secret et remplacer chaque lettre par un " _ "
+                    for ($i = 0; $i <strlen($_SESSION['secret_word']); $i++) { 
+                        $_SESSION['current_word'][$i] = $_SESSION['current_word']."_" ; // ou plus simple :  $_SESSION['current_word'][$i] .= " _ ";
+                    }          
+                }
+        
+                // isset($_POST['partie']); // on vérifie que la variable existe 
+                // $_POST['partie'] == 'new'; // on vérifie qu'il y a une valeur dedans            
             ?>
+            <br>
+            <div class="currentWord">
+                <?php
+                    echo $_SESSION['current_word'].'<br>';        
+                ?>
+            </div>
         </div>
 
     </div>
 
-</div>
-
     <div class="alphabet">
         <?php
-        //a, b, c ...
+        //quand faut'il créer une nouvelle partie ? 
         if (isset($_POST['partie']) && $_POST['partie'] == 'new') {
             init();
         } 
-        
+        //Affichage du mot + alphabet
         for ($i = 0; $i < strlen($alphabet); $i++) {
             echo " <a href='index.php?letter=$alphabet[$i]'>$alphabet[$i]</a> ";
         }
         ?>
-
     </div>
-
+    
+    <div class="winGame">
         <?php
-        if (isset($_GET['letter']) && strlen($_GET['letter']) == 1 && strpos($alphabet, $_GET['letter']) !==false) {
-            echo "<br/>".$_GET['letter'];
-        }
-
-        
-function chooseLetter ($letter){
-    for ($i = 0; $i < strlen($_SESSION['secret_word']); $i++){
-        if $letter[$i] == $_SESSION['secret_word'][$i] {
-            echo $letter == $_SESSION['current_word'][$i];
-        }
-    }
-}
-       chooseLetter($_GET)
-
+            if ($_SESSION['secret_word'] == $_SESSION['current_word']) {
+                echo ' <h1> You WIN !</h1> ';
+            }
         ?>
+     </div>
 
         
 
