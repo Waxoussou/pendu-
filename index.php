@@ -68,22 +68,20 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
 <body>
 
     <?php
-    function chooseLetter ($letter){
-        
-        $found = false; //variable pour compter lettre erronée 
-        for ($i = 0; $i < strlen($_SESSION['secret_word']); $i++) {
-            if ($_SESSION['secret_word'][$i] == $letter) {
-                $_SESSION['current_word'][$i] = $letter;
-                $found = true;
-            }
-        } 
-        if (!$found){
-            $_SESSION['error'] ++ ;
-            }
-    }
-    ?>
+        function chooseLetter ($letter){
+            
+            $found = false; //variable pour compter lettre erronée 
+            for ($i = 0; $i < strlen($_SESSION['secret_word']); $i++) {
+                if ($_SESSION['secret_word'][$i] == $letter) {
+                    $_SESSION['current_word'][$i] = $letter;
+                    $found = true;
+                }
+            } 
+            if (!$found){
+                $_SESSION['error'] ++ ;
+                }
+        }
 
-    <?php
         //est ce que l'utilisateur a choisi une lettre ?
         if (isset($_GET['letter']) && strlen($_GET['letter']) == 1 && strpos($alphabet, $_GET['letter']) !==false && $_SESSION['error'] < 10) {
          //   echo "<br/>".$_GET['letter'];
@@ -91,10 +89,9 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
             echo  '<p> counter : '.$_SESSION['count'].'</p>';
             echo '<p> number of mistakes : '.$_SESSION['error'].'</p>';
             chooseLetter($_GET['letter']);
+            $_SESSION['indisponible_letter'] .= $_GET['letter'];
         }
-    ?>
-
-    <?php
+  
         //quand faut'il créer une nouvelle partie ? 
         if (isset($_POST['partie']) && $_POST['partie'] == 'new')  {
             init();
@@ -115,6 +112,7 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
                     $_SESSION['current_word'] = "";
                     $_SESSION['count'] = 0; 
                     $_SESSION['error'] = 0;
+                    $_SESSION['indisponible_letter'] = "";
 
                     //boucle pour parcourir le mot secret et remplacer chaque lettre par un " _ "
                     for ($i = 0; $i <strlen($_SESSION['secret_word']); $i++) { 
@@ -140,7 +138,9 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
             //Affichage du mot + alphabet
             if ($_SESSION['error']<10 && $_SESSION['secret_word'] !== $_SESSION['current_word']){
                 for ($i = 0; $i < strlen($alphabet); $i++) {
-                    echo " <a href='index.php?letter=$alphabet[$i]'>$alphabet[$i]</a> ";
+                    if(strpos($_SESSION['indisponible_letter'], $alphabet[$i])===false){
+                        echo " <a href='index.php?letter=$alphabet[$i]'>$alphabet[$i]</a> ";
+                    }
                 }
             }
         ?>
