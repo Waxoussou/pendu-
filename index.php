@@ -22,6 +22,11 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
         text-transform: uppercase; 
         font-weight: bold; 
         margin: 25px 50px; 
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .newGame:hover {
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.4); 
     }
 
    .party{
@@ -105,10 +110,34 @@ $alphabet = "abcdefghijklmnopqrstuvwxyz"
         </form>
         <div class="secretWord">
             <?php
+
+                function randomWord() {
+                    // Connexion à la bdd
+                    $bdd = new PDO ('mysql:host=localhost; port=3307; dbname=tp pendu; charset=utf8', 'root', null);
+
+                    // Combien de mots
+                    $count_request = $bdd->query('SELECT COUNT(*) As nb FROM dictionnaire');
+                    $word_count = $count_request->fetch() ['nb'];
+
+                    // Mot Aléatoire 
+                    $random_number = rand(1, $word_count);
+                    $word_request = $bdd->query('SELECT * FROM dictionnaire');
+
+                    for ($i=0; $i<$random_number; $i++) {
+                        $chosen_word = $word_request->fetch() ['word'];
+                    }
+
+                    // Fermeture de la requête 
+                    $word_request->closeCursor();
+                    $count_request->closeCursor();
+
+                    return $chosen_word;
+                }
+
                 function init() {
                     global $alphabet;
                     session_unset(); // je libère toutes les variables des parties précédentes
-                    $_SESSION['secret_word'] = "pendejo";
+                    $_SESSION['secret_word'] = randomWord();
                     $_SESSION['current_word'] = "";
                     $_SESSION['count'] = 0; 
                     $_SESSION['error'] = 0;
